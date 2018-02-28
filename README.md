@@ -24,3 +24,4 @@ More complex inputs and outputs will eventually be able to be designated.
 
 [![Travis-CI Dev Build Status](https://travis-ci.org/pbulsink/GCMSResultsCompiler.svg?branch=dev)](https://travis-ci.org/pbulsink/GCMSResultsCompiler)
 
+[![Coverage Status](https://img.shields.io/codecov/c/github/pbulsink/GCMSResultsCompiler/master.svg)](https://codecov.io/github/pbulsink/GCMSResultsCompiler?branch=master)

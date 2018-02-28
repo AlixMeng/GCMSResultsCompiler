@@ -14,5 +14,6 @@ Imports: readxl,
     stats,
     utils,
     stringr
-Suggests: testthat
+Suggests: testthat,
+    covr
 RoxygenNote: 6.0.1
