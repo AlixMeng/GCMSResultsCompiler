@@ -13,7 +13,8 @@ Imports: readxl,
     rmarkdown,
     stats,
     utils,
-    stringr
+    stringr,
+    dplyr
 Suggests: testthat,
     covr
 RoxygenNote: 6.0.1
