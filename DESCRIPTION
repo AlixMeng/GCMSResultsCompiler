@@ -4,10 +4,15 @@ Title: Compile GCMS Results to Tables
 Version: 0.1.0
 Author: Who wrote it
 Maintainer: Philip Bulsink <bulsinkp@gmail.com>
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: Takes Agilent MassHunter output .xlsx files and condenses results to a table of area by carbon count, carbon & hydrogen count, and carbon, hydrogen, and heteroatom count.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
+Depends: R (>= 2.10)
 Imports: readxl,
+    rmarkdown,
+    stats,
+    utils,
     stringr
+Suggests: testthat
+RoxygenNote: 6.0.1

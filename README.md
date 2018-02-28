@@ -8,7 +8,7 @@ This is the typical usage:
 
 ``` r
 library(GCMSResultsCompiler)
-compile_results("source_file_dir", "results_files_dir")
+compile_reports("source_file_dir", "results_files_dir")
 ```
 
 More complex inputs and outputs will eventually be able to be designated.
