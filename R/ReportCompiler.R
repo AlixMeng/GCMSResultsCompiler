@@ -13,11 +13,15 @@ compile_reports <- function(source_file_dir, results_files_dir = NULL, report_te
     write_csv = TRUE, ...) {
 
   #Checks before stopping
-  stopifnot((write_pdf || write_csv), "Must generate either PDF or CSV files.")
+  if (!write_pdf && !write_csv){
+    stop("Must generate either PDF or CSV files.")
+  }
 
   #Find files
   filelist <- list.files(source_file_dir, pattern = "*.xls*")
-  stopifnot(length(filelist>0), paste("No .xlsx files found in source_file_dir:", source_file_dir))
+  if(length(filelist)==0){
+    stop(paste("No .xlsx files found in source_file_dir:", source_file_dir))
+  }
 
   if(is.null(results_files_dir)){
     results_files_dir<-file.path(source_file_dir, 'results')
@@ -67,7 +71,9 @@ single_report<-function(results_file, results_files_dir, report_template, elemen
   results <- as.data.frame(readxl::read_excel(results_file, col_names = FALSE))
 
   ctrow <- which(results[, 1] == "Compound Table")
-  stopifnot(ctrow > 0, "Could not find Compound Table in source file.")
+  if(!(ctrow > 0)){
+    stop("Could not find Compound Table in source file.")
+  }
 
   header <- results[1:(ctrow - 1), ]
   compound_table <- results[(ctrow + 1):nrow(results), ]
@@ -161,10 +167,6 @@ single_report<-function(results_file, results_files_dir, report_template, elemen
   by_all <- dplyr::arrange(by_all, C, H, Area)
 
   element_included_list <- colnames(by_all)[1:(length(colnames(by_all)) - 2)]
-
-  rownames(by_all) <- NULL
-  rownames(by_c) <- NULL
-  rownames(by_ch) <- NULL
 
   if(write_pdf){
     rmarkdown::render(input = system.file("rmd/genericreport.rmd", package = "GCMSResultsCompiler"), output_format = "pdf_document",
