@@ -14,30 +14,27 @@ globalVariables(c("elements"))
 check_heteroatoms<-function(heteroatoms){
 
   if(is.null(heteroatoms)){
-    return(c("C", "H", "N", "O", "S", "F", "Cl", "Br", "I", "P", "B", "Si"))
-  } else {
-    if(!is.character(unlist(heteroatoms))){
-      stop("Heteroatoms must be a character only vector")
-    }
-    heteroatoms<-as.vector(heteroatoms)
-    if (!c('C', 'H') %in% heteroatoms){
-      message("Adding C, H to heteroatoms list")
-      element_list<-c("C", "H", heteroatoms)
-    }
-    if (!'C' %in% heteroatoms){
-      message("Adding C to heteroatoms list")
-      element_list <-c("C", heteroatoms)
-    }
-    if (!'H' %in% heteroatoms){
-      message("Adding H to heteroatoms list")
-      element_list <-c("H", heteroatoms)
-    }
-
-    if(!heteroatoms %in% elements){
-      element_list<-heteroatoms[heteroatoms %in% elements]
-      message(paste("Removed", length(heteroatoms)-length(element_list), "non-atoms from heteroatom list:", paste0(heteroatoms[!heteroatoms %in% elements], collapse=", ")))
-    }
+    return(elements)
   }
+  element_list<-unlist(heteroatoms)
+  if(any(grepl("[^A-Za-z]", element_list))){  #Any non-letter characters in set
+    stop("Heteroatoms must be a character only vector")
+  }
+  if(any(!(element_list %in% elements))){
+    element_list<-element_list[element_list %in% elements]
+    message(paste("Removed", length(heteroatoms)-length(element_list), "non-atoms from heteroatom list:", paste0(heteroatoms[!(heteroatoms %in% elements)], collapse=", ")))
+  }
+  if (!("C" %in% element_list) && !("H" %in% element_list)){
+    message("Adding C, H to heteroatoms list")
+    element_list<-c("C", "H", element_list)
+  } else if (!('C' %in% element_list)){
+    message("Adding C to heteroatoms list")
+    element_list <-c("C", element_list)
+  } else if (!('H' %in% element_list)){
+    message("Adding H to heteroatoms list")
+    element_list <-c("H", element_list)
+  }
+  return(element_list)
 }
 
 
@@ -52,10 +49,10 @@ check_heteroatoms<-function(heteroatoms){
 #'
 #' @keywords Internal
 element_count <- function(formula, element) {
-    if (is.na(formula)) {
+    if (is.na(formula) || is.numeric(element)) {
         return(0)
     }
-    count <- stringr::str_match(formula, paste0(element, "([0-9]*)"))[2]
+    count <- stringr::str_match(formula, paste0(element, "(?![a-z])([0-9]*)"))[2]  # The (?![^a-z]) makes sure that C doesn't hit on Ca
     if (is.na(count)) {
         return(0)
     } else if (count == "") {
@@ -75,6 +72,8 @@ element_count <- function(formula, element) {
 #'
 #' @return value from key:value pair
 extract_key_value <- function(info_frame, info_key){
-  stopifnot(info_key %in% info_frame$key, paste0(info_key, " not found in source file headers."))
+  if(!(info_key %in% info_frame$key)){
+    stop(paste0(info_key, " not found in source file headers."))
+  }
   return(info_frame[info_frame$key == info_key, ]$value)
 }
