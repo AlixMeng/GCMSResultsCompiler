@@ -68,6 +68,8 @@ single_report<-function(results_file, results_files_dir, report_template, elemen
     knitverbose <- FALSE
   }
 
+  element_list<-check_heteroatoms(element_list)
+
   results <- as.data.frame(readxl::read_excel(results_file, col_names = FALSE))
 
   ctrow <- which(results[, 1] == "Compound Table")
@@ -76,6 +78,10 @@ single_report<-function(results_file, results_files_dir, report_template, elemen
   }
 
   header <- results[1:(ctrow - 1), ]
+  if(nrow(header) == 0){
+    stop("Could not find header information in source file.")
+  }
+
   compound_table <- results[(ctrow + 1):nrow(results), ]
 
   header <- Filter(function(x) !all(is.na(x)), header)
@@ -89,6 +95,10 @@ single_report<-function(results_file, results_files_dir, report_template, elemen
     h <- h[stats::complete.cases(h), ]
     colnames(h) <- c("key", "value")
     header_vals <- rbind(header_vals, h)
+  }
+
+  if (nrow(header_vals) == 0){
+    stop("Header information not found in source file.")
   }
 
   rm(header, h, results)
