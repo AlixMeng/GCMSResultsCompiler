@@ -9,7 +9,7 @@ author: "r Sys.info()[['user']]"
 ---
 
 ```{r setup, include=FALSE}
-knitr::set(progress = knitverbose, verbose = knitverbose)
+knitr::opts_knit$set(progress = knitverbose, verbose = knitverbose)
 knitr::opts_chunk$set(echo = TRUE)
 library(knitr)
 library(pander)

@@ -20,7 +20,7 @@ compile_reports <- function(source_file_dir, results_files_dir = NULL, report_te
   #Find files
   filelist <- list.files(source_file_dir, pattern = "*.xls*")
   if(length(filelist)==0){
-    stop(paste("No .xlsx files found in source_file_dir:", source_file_dir))
+    stop(paste("No .xls(x) files found in source_file_dir:", source_file_dir))
   }
 
   if(is.null(results_files_dir)){
@@ -38,8 +38,8 @@ compile_reports <- function(source_file_dir, results_files_dir = NULL, report_te
     source_file<-file.path(source_file_dir, results_file)
     tryCatch(
       single_report(source_file, results_files_dir, report_template, element_list, write_pdf, write_csv, ...),
-      error = function(e) message("Error in generating report file from ", results_file, "./nError message: ", e),
-      warning = function(w) message("Warning in generating report file from", results_file, "./nWarning message: ", w)
+      error = function(e) message("Error in generating report file from ", results_file, ".\nError message: ", e),
+      warning = function(w) message("Warning in generating report file from", results_file, ".\nWarning message: ", w)
       )
   }
 }
@@ -71,7 +71,6 @@ single_report<-function(results_file, results_files_dir, report_template, elemen
   element_list<-check_heteroatoms(element_list)
 
   results <- as.data.frame(readxl::read_excel(results_file, col_names = FALSE))
-
   ctrow <- which(results[, 1] == "Compound Table")
   if(!(ctrow > 0)){
     stop("Could not find Compound Table in source file.")
@@ -125,12 +124,6 @@ single_report<-function(results_file, results_files_dir, report_template, elemen
     compound_table[element_list[i]] <- V_element_count(formula = compound_table$`Molecular Formula`, element = element_list[i])
   }
 
-  # Remove empty rows that sneak trhough sometimes
-  zeroRows <- unname((rowSums(by_all, na.rm = TRUE) == 0))
-  if (sum(zeroRows) > 0) {
-    by_all <- by_all[!zeroRows, ]
-  }
-
   compound_table$Area <- as.numeric(compound_table$Area)
   total_area <- sum(compound_table$Area, na.rm = TRUE)
 
@@ -171,7 +164,8 @@ single_report<-function(results_file, results_files_dir, report_template, elemen
   by_ch <- dplyr::arrange(by_ch, C, H)
 
   by_all <- dplyr::select(compound_table, dplyr::one_of(c(element_list, 'Area')))
-  by_all <- dplyr::group_by(dplyr::one_of(element_list))
+  by_all <- dplyr::select(by_all, which(!colSums(by_all, na.rm=TRUE) == 0))
+  by_all <- dplyr::group_by_at(by_all, dplyr::vars(names(by_all)[names(by_all) %in% element_list]))
   by_all <- dplyr::summarise(by_all, Area = sum(Area))
   by_all <- dplyr::mutate(by_all, Area.Percent = Area/total_area*100)
   by_all <- dplyr::arrange(by_all, C, H, Area)
@@ -181,7 +175,7 @@ single_report<-function(results_file, results_files_dir, report_template, elemen
   if(write_pdf){
     rmarkdown::render(input = system.file("rmd/genericreport.rmd", package = "GCMSResultsCompiler"), output_format = "pdf_document",
                       output_file = paste(sample_id, "_breakdown.pdf", sep = ""), output_dir = results_files_dir,
-                      params = list(set_title = paste0(sample_id, " Breakdown Report"), set_date = Sys.Date()))
+                      params = list(set_title = paste0(sample_id, " Breakdown Report"), set_date = Sys.Date()), quiet = !(verbose == 2))
     if(verbose==1){
       message("PDF created: ", file.path(results_files_dir, paste0(sample_id, "_breakdown.csv")))
     }
