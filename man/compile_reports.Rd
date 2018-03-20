@@ -6,7 +6,7 @@
 \usage{
 compile_reports(source_file_dir, results_files_dir = NULL,
   report_template = NULL, heteroatoms = GCMSResultsCompiler::elements,
-  write_pdf = TRUE, write_csv = TRUE, ...)
+  write_pdf = TRUE, write_csv = TRUE, verbose = 1, ...)
 }
 \arguments{
 \item{source_file_dir}{The folder containing the source MassHunter .xlsx files}
@@ -19,7 +19,9 @@ compile_reports(source_file_dir, results_files_dir = NULL,
 
 \item{write_pdf}{Whether to generate a pdf report}
 
-\item{write_csv}{Whether to generate csv tables.}
+\item{write_csv}{Whether to generate csv tables}
+
+\item{verbose}{Verbosity level: 0 = silent, 1 = normal, 2 = verbose}
 
 \item{...}{Arguments passed on to \code{single_report}
 \describe{

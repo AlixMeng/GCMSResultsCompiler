@@ -11,7 +11,4 @@ elements
 \description{
 This list of elements includes all elements with IUPAC assigned symbols, plus Deuterium
 }
-\examples{
-elements
-}
 \keyword{datasets}

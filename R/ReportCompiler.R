@@ -5,12 +5,13 @@
 #' @param report_template The report template. A default template is included in the package under /rmd/genericreport.rmd
 #' @param heteroatoms The list of atoms and heteroatoms to check for in the 'all atoms' table. Must include C, H. Defaults to all atoms
 #' @param write_pdf Whether to generate a pdf report
-#' @param write_csv Whether to generate csv tables.
+#' @param write_csv Whether to generate csv tables
+#' @param verbose Verbosity level: 0 = silent, 1 = normal, 2 = verbose
 #' @inheritDotParams single_report
 #'
 #' @export
 compile_reports <- function(source_file_dir, results_files_dir = NULL, report_template = NULL, heteroatoms = GCMSResultsCompiler::elements, write_pdf = TRUE,
-    write_csv = TRUE, ...) {
+    write_csv = TRUE, verbose = 1, ...) {
 
   #Checks before stopping
   if (!write_pdf && !write_csv){
@@ -22,13 +23,16 @@ compile_reports <- function(source_file_dir, results_files_dir = NULL, report_te
   if(length(filelist)==0){
     stop(paste("No .xls(x) files found in source_file_dir:", source_file_dir))
   }
+  if (verbose == 2){
+    print(paste0("Found ", length(filelist), " files to process."))
+  }
 
   if(is.null(results_files_dir)){
     results_files_dir<-file.path(source_file_dir, 'results')
   }
 
   if(!dir.exists(results_files_dir)){
-    message("Creating results folder ", results_files_dir)
+    print(paste0("Creating results folder ", results_files_dir))
     dir.create(results_files_dir)
   }
 
@@ -36,10 +40,13 @@ compile_reports <- function(source_file_dir, results_files_dir = NULL, report_te
 
   for (results_file in filelist){
     source_file<-file.path(source_file_dir, results_file)
+    if(verbose == 2){
+      print(paste0("Trying to process ", results_file, "."))
+    }
     tryCatch(
-      single_report(source_file, results_files_dir, report_template, element_list, write_pdf, write_csv, ...),
-      error = function(e) message("Error in generating report file from ", results_file, ".\nError message: ", e),
-      warning = function(w) message("Warning in generating report file from", results_file, ".\nWarning message: ", w)
+      single_report(source_file, results_files_dir, report_template, element_list, write_pdf, write_csv, verbose = verbose, ...),
+      error = function(e) print(paste0("Error in generating report file from ", results_file, ".\nError message: ", e)),
+      warning = function(w) print(paste0("Warning in generating report file from", results_file, ".\nWarning message: ", w))
       )
   }
 }
@@ -105,6 +112,9 @@ single_report<-function(results_file, results_files_dir, report_template, elemen
   data_file_name <- extract_key_value(header_vals, "Data File")
   sample_id <- extract_key_value(header_vals, "Sample Name")
   sample_name <- extract_key_value(header_vals, "Comment")
+  if(verbose == 2){
+    print(paste0("Processing sample ", sample_name," results."))
+  }
   analysis_date <- extract_key_value(header_vals, "Acquired Time")
   acquisition_method <- extract_key_value(header_vals, "Acq Method")
   data_analysis_method <- extract_key_value(header_vals, "DA Method")
@@ -177,24 +187,24 @@ single_report<-function(results_file, results_files_dir, report_template, elemen
                       output_file = paste(sample_id, "_breakdown.pdf", sep = ""), output_dir = results_files_dir,
                       params = list(set_title = paste0(sample_id, " Breakdown Report"), set_date = Sys.Date()), quiet = !(verbose == 2))
     if(verbose==1){
-      message("PDF created: ", file.path(results_files_dir, paste0(sample_id, "_breakdown.csv")))
+      print(paste0("PDF created: ", file.path(results_files_dir, paste0(sample_id, "_breakdown.csv"))))
     }
   }
 
   if(write_csv){
     utils::write.csv(x = by_c, file = file.path(results_files_dir, paste0(sample_id, "_by_c.csv")), row.names = FALSE)
     if(verbose == 2){
-      message("Output created: ", file.path(results_files_dir, paste0(sample_id, "_by_c.csv")))
+      print(paste0("Output created: ", file.path(results_files_dir, paste0(sample_id, "_by_c.csv"))))
     }
     utils::write.csv(x = by_ch, file = file.path(results_files_dir, paste0(sample_id, "_by_ch.csv")), row.names = FALSE)
     if(verbose == 2){
-      message("Output created: ", file = file.path(results_files_dir, paste0(sample_id, "_by_ch.csv")))
+      print(paste0("Output created: ", file = file.path(results_files_dir, paste0(sample_id, "_by_ch.csv"))))
     }
     utils::write.csv(x = by_all, file = file.path(results_files_dir, paste0(sample_id, "_by_all.csv")), row.names = FALSE)
     if(verbose == 2){
-      message("Output created: ", file.path(results_files_dir, paste0(sample_id, "_by_all.csv")))
+      print(paste0("Output created: ", file.path(results_files_dir, paste0(sample_id, "_by_all.csv"))))
     } else if (verbose == 1) {
-      message("CSV files created for sample: ", sample_id)
+      print(paste0("CSV files created for sample: ", sample_id))
     }
 
   }
