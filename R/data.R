@@ -4,4 +4,6 @@
 #'
 #' @docType data
 #' @format A character vector of length 119
+#' @example
+#' elements
 "elements"

@@ -14,7 +14,9 @@ Imports: readxl,
     stats,
     utils,
     stringr,
-    dplyr
+    dplyr,
+    pander,
+    tinytex
 Suggests: testthat,
     covr
 RoxygenNote: 6.0.1
