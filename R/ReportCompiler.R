@@ -32,7 +32,9 @@ compile_reports <- function(source_file_dir, results_files_dir = NULL, report_te
   }
 
   if(!dir.exists(results_files_dir)){
-    message("Creating results folder ", results_files_dir)
+    if (verbose != 0){
+      message("Creating results folder ", results_files_dir)
+    }
     dir.create(results_files_dir)
   }
 
@@ -179,6 +181,7 @@ single_report<-function(results_file, results_files_dir, report_template, elemen
   by_all <- dplyr::summarise(by_all, Area = sum(Area))
   by_all <- dplyr::mutate(by_all, Area.Percent = Area/total_area*100)
   by_all <- dplyr::arrange(by_all, C, H, Area)
+  by_all <- dplyr::select(by_all, C, H, dplyr::everything())  # Puts C&H at the front of the list
 
   element_included_list <- colnames(by_all)[1:(length(colnames(by_all)) - 2)]
 

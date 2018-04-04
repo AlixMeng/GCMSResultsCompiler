@@ -14,15 +14,15 @@ globalVariables(c("elements"))
 check_heteroatoms<-function(heteroatoms){
 
   if(is.null(heteroatoms)){
-    return(elements)
+    return(GCMSResultsCompiler::elements)
   }
   element_list<-unlist(heteroatoms)
   if(any(grepl("[^A-Za-z]", element_list))){  #Any non-letter characters in set
     stop("Heteroatoms must be a character only vector")
   }
-  if(any(!(element_list %in% elements))){
-    element_list<-element_list[element_list %in% elements]
-    message(paste("Removed", length(heteroatoms)-length(element_list), "non-atoms from heteroatom list:", paste0(heteroatoms[!(heteroatoms %in% elements)], collapse=", ")))
+  if(any(!(element_list %in% GCMSResultsCompiler::elements))){
+    element_list<-element_list[element_list %in% GCMSResultsCompiler::elements]
+    message(paste("Removed", length(heteroatoms)-length(element_list), "non-atoms from heteroatom list:", paste0(heteroatoms[!(heteroatoms %in% GCMSResultsCompiler::elements)], collapse=", ")))
   }
   if (!("C" %in% element_list) && !("H" %in% element_list)){
     message("Adding C, H to heteroatoms list")

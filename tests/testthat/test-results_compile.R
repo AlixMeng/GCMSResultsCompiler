@@ -10,7 +10,7 @@ test_that("Compile reports makes reports", {
   examplefile <- system.file("extdata", "testreport.xls", package = "GCMSResultsCompiler", mustWork = TRUE)
   examplepath <- dirname(examplefile)
 
-  compile_reports(examplepath, "./reports", verbose=2)
+  compile_reports(examplepath, "./reports", verbose=1)
 
   expect_true(file.exists("./reports/alkanes_by_c.csv"))
   expect_true(file.exists("./reports/alkanes_by_ch.csv"))
